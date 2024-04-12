@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Common;
 using System.Data;
+using Common.Models;
 
 namespace Discovery
 {
@@ -64,47 +65,22 @@ namespace Discovery
         List<SP2010WorkFlowAssociation> sp2010WorkflowAssociations = new List<SP2010WorkFlowAssociation>(20);
         private List workflowList;
 
-
-
-
-
-        //public void DiscoverWorkflows(ClientContext cc, DataTable dt, string folderPath)
         public void DiscoverWorkflows(ClientContext cc, DataTable dt)
 
         {
             try
             {
-                //List<Guid, DateTime> wfLastRun = new List<Guid, DateTime>;
-
                 Web web = cc.Web;
 
                 // Pre-load needed properties in a single call
-                /* old code AM 3/11
-                cc.Load(web, w => w.Id, w => w.ServerRelativeUrl, w => w.Url, w => w.WorkflowTemplates, w => w.WorkflowAssociations);                
-                cc.Load(web, p => p.ContentTypes.Include(ct => ct.WorkflowAssociations, ct => ct.Name, ct => ct.StringId));
-                cc.Load(web, p => p.Lists.Include(li => li.Id, li => li.Title, li => li.Hidden, li => li.DefaultViewUrl, li => li.BaseTemplate, li => li.RootFolder.ServerRelativeUrl, li => li.ItemCount, li => li.WorkflowAssociations));
-                */
                 cc.Load(web, w => w.Id, w => w.Language, w => w.ServerRelativeUrl, w => w.Url, w => w.WorkflowTemplates, w => w.WorkflowAssociations);
                 cc.Load(web, p => p.ContentTypes.Include(ct => ct.WorkflowAssociations, ct => ct.Name, ct => ct.StringId));
                 cc.Load(web, p => p.Lists.Include(li => li.Id, li => li.Title, li => li.Hidden, li => li.DefaultViewUrl, li => li.BaseTemplate, li => li.RootFolder.ServerRelativeUrl, li => li.ItemCount, li => li.WorkflowAssociations, li => li.ContentTypesEnabled, li => li.ContentTypes.Include(ct => ct.WorkflowAssociations, ct => ct.Name, ct => ct.StringId)));
                 cc.Load(cc.Site, p => p.RootWeb);
                 cc.Load(cc.Site.RootWeb, p => p.Lists.Include(li => li.Id, li => li.Title, li => li.Hidden, li => li.DefaultViewUrl, li => li.BaseTemplate, li => li.RootFolder.ServerRelativeUrl, li => li.ItemCount, li => li.WorkflowAssociations, li => li.ContentTypesEnabled, li => li.ContentTypes.Include(ct => ct.WorkflowAssociations, ct => ct.Name, ct => ct.StringId)));
-                /*
-                foreach (List list in web.Lists)
-                {
-                    cc.Load(list, l => l.ContentTypes.Equals("Workflow History"));
-                }
-                foreach(WorkflowAssociation wf in web.WorkflowAssociations)
-                {
-                    cc.Load
-                }*/
+                
                 cc.ExecuteQuery();
-                
-                //yList.Each(x => { x.Enabled = false; });
-                //w => w.WorkflowAssociations.Each(x => x.HistoryListTitle)
                 var lists = web.Lists;
-
-                
 
                 #region Site, reusable and list level 2013 workflow
                 // *******************************************
@@ -126,13 +102,8 @@ namespace Discovery
 
                     var definitions = deploymentService.EnumerateDefinitions(false);
                     web.Context.Load(definitions);
-
                     var subscriptions = subscriptionService.EnumerateSubscriptions();
                     web.Context.Load(subscriptions);
-                    //for each subscription
-                    //    Get History List => SubscriptionID, HstoryListID
-                    //Load Hstory list Item where item = listitems[ListItems.Length - 1]["Occurred"]
-
 
                     web.Context.ExecuteQuery();
 
@@ -157,10 +128,7 @@ namespace Discovery
 
                         // Perform workflow analysis
                         var workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(siteWFDefinition.Xaml, WorkflowTypes.SP2013);
-                        //if (siteWFDefinition.Xaml != null)
-                        //{
-                        //    ops.SaveXamlFile(siteWFDefinition.Xaml, web, siteWFDefinition.DisplayName, "site", folderPath);
-                        //}
+                        
                         var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartManually"));
 
                         if (siteWorkflowSubscriptions.Count() > 0)
@@ -272,10 +240,7 @@ namespace Discovery
 
                         // Perform workflow analysis
                         var workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(listWFDefinition.Xaml, WorkflowTypes.SP2013);
-                        //if (listWFDefinition.Xaml != null)
-                        //{
-                        //    ops.SaveXamlFile(listWFDefinition.Xaml, web, listWFDefinition.DisplayName,"list", folderPath);
-                        //}
+                        
                         var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartManually"));
 
                         if (listWorkflowSubscriptions.Count() > 0)

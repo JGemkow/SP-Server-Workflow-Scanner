@@ -7,7 +7,7 @@ namespace Discovery
     public abstract class DiscoveryBase
     {
         private string url;
-        private string siteColUrl;
+        private string siteCollUrl;
 
         /// <summary>
         /// Base constructor
@@ -17,7 +17,7 @@ namespace Discovery
         public DiscoveryBase(string url, string siteColUrl)
         {
             this.url = url;
-            this.siteColUrl = siteColUrl;
+            this.siteCollUrl = siteColUrl;
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Discovery
         {
             get
             {
-                return this.siteColUrl;
+                return this.siteCollUrl;
             }
         }
 

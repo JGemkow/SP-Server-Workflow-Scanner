@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using Common;
+using Common.Models;
 
 namespace Discovery
 {
@@ -157,7 +158,7 @@ namespace Discovery
                 }
 
                 var xmlDoc = new XmlDocument();
-                xmlDoc.Load(WebpartMappingLoader.GenerateStreamFromString(workflowDefinition));
+                xmlDoc.Load(workflowDefinition.GenerateStream());
 
                 //determine  whether document contains namespace
                 string namespaceName = "";
@@ -345,7 +346,7 @@ namespace Discovery
                 if (wfType == WorkflowTypes.SP2010)
                 {
                     Common.SP2010.WorkflowInfo wfInformation;
-                    using (var stream = WebpartMappingLoader.GenerateStreamFromString(wfModelString))
+                    using (var stream = wfModelString.GenerateStream())
                     {
                         XmlSerializer xmlWorkflowInformation = new XmlSerializer(typeof(Common.SP2010.WorkflowInfo));
                         wfInformation = (Common.SP2010.WorkflowInfo)xmlWorkflowInformation.Deserialize(stream);
@@ -362,7 +363,7 @@ namespace Discovery
                 else if (wfType == WorkflowTypes.SP2013)
                 {
                     Common.SP2013.WorkflowInfo wfInformation;
-                    using (var stream = WebpartMappingLoader.GenerateStreamFromString(wfModelString))
+                    using (var stream = wfModelString.GenerateStream())
                     {
                         XmlSerializer xmlWorkflowInformation = new XmlSerializer(typeof(Common.SP2013.WorkflowInfo));
                         wfInformation = (Common.SP2013.WorkflowInfo)xmlWorkflowInformation.Deserialize(stream);

@@ -27,7 +27,6 @@ namespace Root
         public DirectoryInfo summaryFolder;
         public DataTable dt = new DataTable();
 
-        //public DataTable Execute(PSCredential Credential)
         public DataTable Execute()
         {
             List<string> siteCollectionsUrl = new List<string>();
@@ -38,7 +37,6 @@ namespace Root
                 Console.WriteLine(System.Environment.NewLine);
                 Console.WriteLine("Starting to analyze on-premise environment");
 
-                //GetWorkflows();
                 if (Scope == "Farm")
                 {
                     siteCollectionsUrl = QueryFarm();
