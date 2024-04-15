@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root", "Root\Root.csproj", "{C36A3FF3-1A6B-4ACD-94FC-0BC798082603}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discovery", "Discovery\Discovery.csproj", "{66180571-9292-4411-8B01-B31DCE2CC0E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowScanner", "Discovery\WorkflowScanner.csproj", "{66180571-9292-4411-8B01-B31DCE2CC0E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

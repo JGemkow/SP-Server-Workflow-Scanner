@@ -3,7 +3,7 @@ using System;
 
 namespace Common.Models
 {
-    public abstract class DiscoverBase : IBaseAnalyzer
+    public abstract class BaseAnalyzer : IBaseAnalyzer
     {
         private string url;
         private string siteColUrl;
@@ -14,7 +14,7 @@ namespace Common.Models
         /// </summary>
         /// <param name="url">Url of the current web</param>
         /// <param name="siteColUrl">url of the current site collection</param>
-        public DiscoverBase(string url, string siteColUrl)
+        public BaseAnalyzer(string url, string siteColUrl)
         {
             this.url = url;
             this.siteColUrl = siteColUrl;

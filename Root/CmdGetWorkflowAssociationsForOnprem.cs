@@ -4,23 +4,25 @@ using System.Collections.Generic;
 using System.Data;
 using System.Management.Automation;
 using Common;
+using Discovery;
+using System.Net;
 
 
 namespace Root
 {
     /// <summary>
-    /// Commandlet to discover the InfoPath forms in 
+    /// Commandlet to discover the Workflow Asssociations in 
     /// Onpremise environments that are published to
     /// list and document libraries
     /// </summary>
-    /// <returns></returns>   /// 
+    /// <returns></returns>
     ///
 
     [Cmdlet(VerbsCommon.Get, "WorkflowAssociationsForOnprem")]
     public class CmdGetWorkflowAssociationsForOnprem : PSCmdlet
     {
         private string assessmentScope;
-        private static List<string> sitecollectionUrls = new List<string>();
+        private static List<string> siteCollectionUrls = new List<string>();
 
         [Parameter(Mandatory = true, HelpMessage = "Specify the Domain name of the user account")]
         public string DomainName;
@@ -127,7 +129,7 @@ namespace Root
 
         protected void BeginToAssess()
         {
-            Operations ops = new Operations();
+            ReportGeneration ops = new ReportGeneration();
             try
             {
                 //New Code Starts
@@ -147,7 +149,7 @@ namespace Root
                 }
                 if (userInput.Equals("y"))
                 {
-                    GetWorkflowsforOnPrem objonPrem = new GetWorkflowsforOnPrem();
+                    WorkflowScanning objonPrem = new WorkflowScanning();
                     ops.CreateDirectoryStructure(AssessmentOutputFolder);
                     Console.WriteLine(System.Environment.NewLine);
                     Host.UI.WriteLine(ConsoleColor.Yellow, Host.UI.RawUI.BackgroundColor, "Beginning assessment..");
@@ -177,14 +179,11 @@ namespace Root
                     //Set Credentials from user entry 
                     if (Credential != null)
                     {
-                        objonPrem.Credential = Credential;
-                    } 
-                    else
-                    { 
+                        objonPrem.Credential = new NetworkCredential(Credential.UserName, Credential.Password.ToString(), DomainName);
                     }
                     
                     // run the workflow scan
-                    dtWorkflowLocations = objonPrem.Execute();
+                    dtWorkflowLocations = objonPrem.Scan();
                     //Save the CSV file
                     string csvFilePath = string.Concat(AssessmentOutputFolder, ops.summaryFolder, ops.summaryFile);
                     ops.WriteToCsvFile(dtWorkflowLocations, csvFilePath);
@@ -199,30 +198,5 @@ namespace Root
                 Host.UI.WriteLine(ConsoleColor.DarkRed, Host.UI.RawUI.BackgroundColor, ex.Message);
             }
         }
-        public int LoopSiteCollectionUrls(List<string> sitecollectionUrls, string filePath)
-        {
-            int counter = 0;
-            try
-            {                
-                string line;
-                System.IO.StreamReader file =
-                    new System.IO.StreamReader(filePath);
-                while ((line = file.ReadLine()) != null)
-                {
-                    //removes all extra spaces etc. 
-                    sitecollectionUrls.Add(line.TrimEnd());
-                    counter++;
-                }
-                file.Close();                
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-            }
-            return counter;
-        }
-
-
     }
 }

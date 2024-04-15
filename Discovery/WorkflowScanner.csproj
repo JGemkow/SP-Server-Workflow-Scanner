@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{04A36617-4353-4779-92F9-36BAFFE6A5F6}</ProjectGuid>
+    <ProjectGuid>{66180571-9292-4411-8B01-B31DCE2CC0E8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common</RootNamespace>
-    <AssemblyName>Microsoft.Services.WorkflowAssessment.Common</AssemblyName>
+    <RootNamespace>Discovery</RootNamespace>
+    <AssemblyName>Discovery</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -177,7 +177,6 @@
     </Reference>
     <Reference Include="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SharePoint.dll.15.0.4867.1000\lib\Microsoft.SharePoint\Microsoft.SharePoint.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.SharePoint.Client, Version=16.1.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SharePointOnline.CSOM.16.1.24614.12000\lib\net45\Microsoft.SharePoint.Client.dll</HintPath>
@@ -212,9 +211,6 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OfficeDevPnP.Core">
-      <HintPath>..\packages\SharePointPnPCoreOnline.3.24.2008.1\lib\net461\OfficeDevPnP.Core.dll</HintPath>
-    </Reference>
     <Reference Include="PnP.Core, Version=1.12.0.0, Culture=neutral, PublicKeyToken=0d501f89f11b748c, processorArchitecture=MSIL">
       <HintPath>..\packages\PnP.Core.1.12.0\lib\netstandard2.0\PnP.Core.dll</HintPath>
     </Reference>
@@ -223,9 +219,6 @@
     </Reference>
     <Reference Include="Portable.Xaml, Version=0.26.0.0, Culture=neutral, PublicKeyToken=ba4456acace7dab7, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.Xaml.0.26.0\lib\netstandard2.0\Portable.Xaml.dll</HintPath>
-    </Reference>
-    <Reference Include="SharePointPnP.IdentityModel.Extensions, Version=1.2.4.0, Culture=neutral, PublicKeyToken=5e633289e95c321a, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharePointPnP.IdentityModel.Extensions.1.2.4\lib\net45\SharePointPnP.IdentityModel.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -259,10 +252,6 @@
     </Reference>
     <Reference Include="System.IO.Packaging, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.Packaging.4.7.0\lib\net46\System.IO.Packaging.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
@@ -345,19 +334,45 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\BaseAnalyzer.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Models\IBaseAnalyzer.cs" />
-    <Compile Include="Models\Scan.cs" />
-    <Compile Include="Logging.cs" />
+    <Compile Include="CompareWorkflows.cs" />
+    <Compile Include="Models\WorkflowActionAnalysis.cs" />
+    <Compile Include="Models\WorkFlowActions.cs" />
+    <Compile Include="Models\WorkflowScanResult.cs" />
+    <Compile Include="Models\WorkflowTriggerAnalysis.cs" />
+    <Compile Include="ReportGeneration.cs" />
+    <Compile Include="sp2010wfmodel.cs">
+      <DependentUpon>sp2010wfmodel.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="sp2013wfmodel.cs">
+      <DependentUpon>sp2013wfmodel.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkflowDiscovery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WorkflowAnalyzer.cs" />
+    <Compile Include="WorkflowScanning.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{04a36617-4353-4779-92f9-36baffe6a5f6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="sp2010wfmodel.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="sp2013wfmodel.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="sp2010wfmodel.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sp2013wfmodel.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>cd "C:\GIT-LOCAL\SP-WF-Onprem\Root\bin\Debug"</PostBuildEvent>
-  </PropertyGroup>
 </Project>

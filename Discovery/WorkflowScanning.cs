@@ -1,33 +1,32 @@
 ﻿using Common;
-using Discovery;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Management.Automation;
 using System.Net;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 
-namespace Root
+
+namespace Discovery
 {
-    public class GetWorkflowsforOnPrem
+    public class WorkflowScanning
     {
         public string Url { get; set; }
         public string Scope { get; set; }
-        public PSCredential Credential { get; set; }
         public bool OnPrem { get; set; }
         public string DownloadPath { get; set; }
         public bool DownloadForms { get; set; }
         public string DomainName { get; set; }
+        public NetworkCredential Credential {get;set;}
 
         public DirectoryInfo analysisFolder;
         public DirectoryInfo downloadedFormsFolder;
         public DirectoryInfo summaryFolder;
         public DataTable dt = new DataTable();
 
-        public DataTable Execute()
+        public DataTable Scan()
         {
             List<string> siteCollectionsUrl = new List<string>();
             try
@@ -93,8 +92,6 @@ namespace Root
                         webAppSiteCollectionUrls.Add(site.Url);
                     }
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -103,10 +100,6 @@ namespace Root
             }
             return webAppSiteCollectionUrls;
         }
-
-
-
-
 
         private List<string> GetAllWebAppSitesFromUrl(string filePath)
         {
@@ -121,7 +114,6 @@ namespace Root
                 {
                     //removes all extra spaces etc. 
                     siteCollectionUrls.Add(line.TrimEnd());
-                    //System.Console.WriteLine(line);
                 }
                 file.Close();
             }
@@ -187,7 +179,6 @@ namespace Root
                                 SPWebApplicationCollection webApplications = webService.WebApplications;
                                 foreach (SPWebApplication webApplication in webApplications)
                                 {
-                                    // WriteVerbose("Processing WebApplication " + webApplication.DisplayName);
                                     if (webApplication != null)
                                     {
                                         if (false)
@@ -281,19 +272,15 @@ namespace Root
                         if (!hasPermissions)
                             continue;
                         Console.WriteLine(string.Format("Attempting to fetch all the sites and sub sites of  " + url));
-                        //WriteVerbose("Trying to get all the sites and subsites of : " + url);
                         IEnumerable<string> expandedSites = siteClientContext.Site.GetAllSubSites();
 
                         foreach (string site in expandedSites)
                         {
-                            //Console.WriteLine(string.Format("Going into " + site));
-                            //WriteVerbose("Going into " + site);
                             using (ClientContext ccWeb = siteClientContext.Clone(site))
                             {
                                 try
                                 {
                                     FindWorkflowPerSite(ccWeb);
-                                    //FindInfoPathFormsPerSite(ccWeb);
                                 }
                                 catch (Microsoft.SharePoint.Client.ServerUnauthorizedAccessException unauthorizedException)
                                 {
@@ -301,7 +288,6 @@ namespace Root
                                     Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.StackTrace);
                                     Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.Message.ToString() + " on " + url);
                                     Console.WriteLine(string.Format(unauthorizedException.Message.ToString() + " on " + url));
-                                    //WriteWarning(unauthorizedException.Message.ToString() + " on " + url);
                                 }
                             }
                         }
@@ -327,8 +313,7 @@ namespace Root
                 cc.Load(web);
                 cc.ExecuteQueryRetry();
 
-                //Host.UI.WriteLine(ConsoleColor.DarkMagenta, Host.UI.RawUI.BackgroundColor, web.Title);
-                WorkflowManager.Instance.LoadWorkflowDefaultActions();
+                WorkflowAnalyzer.Instance.LoadWorkflowDefaultActions();
 
                 WorkflowDiscovery wfDisc = new WorkflowDiscovery();
                 wfDisc.DiscoverWorkflows(cc, dt);
@@ -340,12 +325,12 @@ namespace Root
             }
         }
 
-        internal ClientContext CreateClientContext(string url, PSCredential Credential, string domainName)
+        internal ClientContext CreateClientContext(string url, NetworkCredential credential, string domainName)
         {
             ClientContext cc = new ClientContext(url);
             try
             {
-                cc.Credentials = new NetworkCredential(Credential.UserName, Credential.Password, domainName);
+                cc.Credentials = credential;
                 Web web = cc.Web;
                 cc.Load(web, website => website.Title);
                 cc.ExecuteQuery();

@@ -7,15 +7,16 @@ using System.Xml;
 using System.Xml.Serialization;
 using Common;
 using Common.Models;
+using WorkflowScanner.Models;
 
 namespace Discovery
 {
     /// <summary>
     /// Class to handle workflow analysis
     /// </summary>
-    public sealed class WorkflowManager
+    public sealed class WorkflowAnalyzer
     {
-        private static readonly Lazy<WorkflowManager> _lazyInstance = new Lazy<WorkflowManager>(() => new WorkflowManager());
+        private static readonly Lazy<WorkflowAnalyzer> _lazyInstance = new Lazy<WorkflowAnalyzer>(() => new WorkflowAnalyzer());
         private WorkflowActions defaultWorkflowActions;
 
         private static readonly string[] SP2013SupportedFlowActions = new string[]
@@ -97,7 +98,7 @@ namespace Discovery
         /// <summary>
         /// Get's the single workflow manager instance, singleton pattern
         /// </summary>
-        public static WorkflowManager Instance
+        public static WorkflowAnalyzer Instance
         {
             get
             {
@@ -106,7 +107,7 @@ namespace Discovery
         }
 
         #region Construction
-        private WorkflowManager()
+        private WorkflowAnalyzer()
         {
             // place for instance initialization code
             defaultWorkflowActions = null;
@@ -231,8 +232,8 @@ namespace Discovery
             }
             catch (Exception ex)
             {
-                // TODO
-                // Eat exception for now
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
 
             return null;
@@ -264,7 +265,7 @@ namespace Discovery
 
                 if (wfType == WorkflowTypes.SP2010)
                 {
-                    if (!WorkflowManager.SP2010SupportedFlowActions.Contains(defaultOOBWorkflowAction.ActionName))
+                    if (!WorkflowAnalyzer.SP2010SupportedFlowActions.Contains(defaultOOBWorkflowAction.ActionName))
                     {
                         unsupportedActionCounter++;
                         unsupportedOOBWorkflowActivities.Add(defaultOOBWorkflowAction.ActionNameShort);
@@ -272,7 +273,7 @@ namespace Discovery
                 }
                 else if (wfType == WorkflowTypes.SP2013)
                 {
-                    if (!WorkflowManager.SP2013SupportedFlowActions.Contains(defaultOOBWorkflowAction.ActionName))
+                    if (!WorkflowAnalyzer.SP2013SupportedFlowActions.Contains(defaultOOBWorkflowAction.ActionName))
                     {
                         unsupportedActionCounter++;
                         unsupportedOOBWorkflowActivities.Add(defaultOOBWorkflowAction.ActionNameShort);
@@ -323,13 +324,11 @@ namespace Discovery
 
             if (wfType == WorkflowTypes.SP2010)
             {
-                //  fileName = "SharePointPnP.Modernization.Scanner.Core.Workflow.sp2010wfmodel.xml";
-                  fileName = "Common.sp2010wfmodel.xml";
+                  fileName = "WorkflowScanner.sp2010wfmodel.xml";
             }
             else if (wfType == WorkflowTypes.SP2013)
             {
-                fileName = "Common.sp2013wfmodel.xml";
-                // fileName = "SharePointPnP.Modernization.Scanner.Core.Workflow.sp2013wfmodel.xml";
+                fileName = "WorkflowScanner.sp2013wfmodel.xml";
             }
 
             var wfModelString = "";

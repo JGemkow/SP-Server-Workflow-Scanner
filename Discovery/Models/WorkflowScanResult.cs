@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Common.Models;
+using System;
 using System.Collections.Generic;
 
-namespace Common.Models
+namespace WorkflowScanner.Models
 {
     public class WorkflowScanResult : Scan
     {

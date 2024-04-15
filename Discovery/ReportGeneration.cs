@@ -1,23 +1,14 @@
-﻿//using Microsoft.Deployment.Compression.Cab;
-//using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.Data;
 using Microsoft.SharePoint.Client;
-using System.Security;
-using System.Management.Automation;
-using Microsoft.Online.SharePoint.TenantAdministration;
-using Common.Models;
+using WorkflowScanner.Models;
 
 namespace Common
 {
-    
-    public class Operations
+
+    public class ReportGeneration
 
     {
         /// <summary>
@@ -34,21 +25,6 @@ namespace Common
         public string compOutputFile = @"\WorkflowComparison.csv";
         public DataTable dt = new DataTable();
 
-
-        public void SaveXamlFile(string xamlContent, Web web, string wfName, string scope, string folderPath)
-        {
-            try
-            {
-                string fileName = web.Id + "-" + wfName + "-" + scope+".xoml";
-                string filePath = folderPath + "\\"+ fileName;
-                System.IO.File.WriteAllText(filePath, xamlContent);
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-            }        
-        }
         /// <summary>
         /// Create Data Table
         /// </summary>
@@ -257,125 +233,6 @@ namespace Common
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
 
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void WriteProgress(string s, int x, int y)
-        {
-            int origRow = Console.CursorTop;
-            int origCol = Console.CursorLeft;
-            // Console.WindowWidth = 10;  // this works. 
-            int width = Console.WindowWidth;
-            //x = x % width;
-            try
-            {
-                Console.SetCursorPosition(x, y);
-                //Console.SetCursorPosition(origCol, origRow);
-                Console.Write(s);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-
-            }
-            finally
-            {
-                try
-                {
-                    Console.SetCursorPosition(origRow, origCol);
-                }
-                catch (ArgumentOutOfRangeException e)
-                {
-                }
-            }
-        }
-
-        internal ClientContext CreateClientContext(string url, string username, SecureString password)
-        {
-            try
-            {
-                var credentials = new SharePointOnlineCredentials(
-                                       username,
-                                       password);
-
-                return new ClientContext(url)
-                {
-                    Credentials = credentials
-                };
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-                return new ClientContext(url)
-                {
-                };
-            }
-
-
-        }
-
-
-        public List<string> GetAllTenantSites(string TenantName, PSCredential Credential)
-        {
-            List<string> sites = new List<string>();
-            try
-            {
-                string tenantAdminUrl = "https://" + TenantName + "-admin.sharepoint.com/";
-                ClientContext ctx = null;
-                ctx = CreateClientContext(tenantAdminUrl, Credential.UserName, Credential.Password);
-                Tenant tenant = new Tenant(ctx);
-                SPOSitePropertiesEnumerable siteProps = tenant.GetSitePropertiesFromSharePoint("0", true);
-                ctx.Load(siteProps);
-                ctx.ExecuteQuery();
-                int count = 0;
-                foreach (var site in siteProps)
-                {
-                    sites.Add(site.Url);
-                    count++;
-                }
-                Console.WriteLine("Total Site {0}", count);
-                return sites;
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-
-            }
-            return sites;
-        }
-
-        /// <summary>
-        /// Open the site collection file and store in a collection variable
-        /// Read the file and display it line by line.  
-        /// </summary>
-        /// <param name="sitecollectionUrls"></param>
-        public void ReadInfoPathOnlineSiteCollection(List<string> sitecollectionUrls, string filePath)
-        {
-            try
-            {
-                int counter = 0;
-                string line;
-                System.IO.StreamReader file =
-                    new System.IO.StreamReader(filePath);
-                while ((line = file.ReadLine()) != null)
-                {
-                    //removes all extra spaces etc. 
-                    sitecollectionUrls.Add(line.TrimEnd());
-                    counter++;
-                }
-                file.Close();
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
         }
     }

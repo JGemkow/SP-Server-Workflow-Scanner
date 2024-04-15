@@ -31,6 +31,7 @@ namespace Common
         //public string LOG_DIRECTORY { get; set; }
         public const string Info = "INFO";
         public const string Error = "ERROR";
+        public const string Warning = "WARNING";
         private string logFolderPath = LOG_DIRECTORY;
 
         private string LogFolderPath
@@ -120,7 +121,6 @@ namespace Common
         {
             try
             {
-                //string rowFormat = "<table border=0><tr><td nowrap style=\"font-size:x-small;width:200px\" valign='top'><date>{0}</date> <time>{1}</time></td><td  style=\"font-size:x-small;width:450px\"> <message>{2}</message></td></tr></table>";
                 StreamWriter sw = new StreamWriter(this.LogFilePath, true);
                 string logMesg = String.Format(DateTime.Now.ToString(), "\t", level, "\t", message, "\n");
                 logMesg = string.Concat(DateTime.Now.ToString(), "\t", level, "\t", message, "\n");

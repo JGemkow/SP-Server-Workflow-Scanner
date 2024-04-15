@@ -1,7 +1,7 @@
 ﻿using Microsoft.SharePoint.Client;
 using System;
 
-namespace Common
+namespace Common.Models
 {
     /// <summary>
     /// Interface that all analyzers need to implement

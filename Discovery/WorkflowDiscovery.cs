@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using Common;
 using System.Data;
 using Common.Models;
+using WorkflowScanner.Models;
 
 namespace Discovery
 {
@@ -91,7 +92,7 @@ namespace Discovery
                 WorkflowDefinition[] siteWFDefinitions = null;
                 // Retrieve the 2013 site level workflow subscriptions
                 WorkflowSubscription[] siteWFSubscriptions = null;
-                Operations ops = new Operations();
+                ReportGeneration reportGen = new ReportGeneration();
                 //ops.CreateDataTableColumns(dt);
                 DataRow row = dt.NewRow();
                 try
@@ -113,7 +114,9 @@ namespace Discovery
                 catch (ServerException ex)
                 {
                     // If there is no workflow service present in the farm this method will throw an error. 
-                    // Swallow the exception
+                    Logging.GetInstance().WriteToLogFile(Logging.Info, "No workflow service present in farm for 2013 WFM.");
+                    Logging.GetInstance().WriteToLogFile(Logging.Info, ex.Message);
+                    Logging.GetInstance().WriteToLogFile(Logging.Info, ex.StackTrace);
                 }
                 #endregion
 
@@ -127,9 +130,9 @@ namespace Discovery
                         var siteWorkflowSubscriptions = siteWFSubscriptions.Where(p => p.DefinitionId.Equals(siteWFDefinition.Id));
 
                         // Perform workflow analysis
-                        var workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(siteWFDefinition.Xaml, WorkflowTypes.SP2013);
+                        var workFlowAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowDefinition(siteWFDefinition.Xaml, WorkflowTypes.SP2013);
                         
-                        var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartManually"));
+                        var workFlowTriggerAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(siteWFDefinition.Properties, "SPDConfig.StartManually"));
 
                         if (siteWorkflowSubscriptions.Count() > 0)
                         {
@@ -167,20 +170,7 @@ namespace Discovery
                                 //Add admin owners 
                                 //TBD
                                 //Create a data row function
-                                ops.AddRowToDataTable(workflowScanResult, dt, "2013","Site", siteWFDefinition.DisplayName,siteWFDefinition.Id.ToString(), false, web);
-
-
-                                //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
-                                //{
-                                //    ScanError error = new ScanError()
-                                //    {
-                                //        Error = $"Could not add 2013 site workflow scan result for {workflowScanResult.SiteColUrl}",
-                                //        SiteColUrl = this.SiteCollectionUrl,
-                                //        SiteURL = this.SiteUrl,
-                                //        Field1 = "WorkflowAnalyzer",
-                                //    };
-                                //    this.ScanJob.ScanErrors.Push(error);
-                                //}
+                                reportGen.AddRowToDataTable(workflowScanResult, dt, "2013","Site", siteWFDefinition.DisplayName,siteWFDefinition.Id.ToString(), false, web);
                             }
                         }
                         else
@@ -211,7 +201,7 @@ namespace Discovery
                                 UsedTriggers = workFlowTriggerAnalysisResult?.WorkflowTriggers,
                                 LastDefinitionEdit = GetWorkflowPropertyDateTime(siteWFDefinition.Properties, "Definition.ModifiedDateUTC"),
                             };
-                            ops.AddRowToDataTable(workflowScanResult, dt, "2013", "Site",siteWFDefinition.DisplayName,siteWFDefinition.Id.ToString(),  false,web);
+                            reportGen.AddRowToDataTable(workflowScanResult, dt, "2013", "Site",siteWFDefinition.DisplayName,siteWFDefinition.Id.ToString(),  false,web);
 
                             //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
                             //{
@@ -239,9 +229,9 @@ namespace Discovery
                         var listWorkflowSubscriptions = siteWFSubscriptions.Where(p => p.DefinitionId.Equals(listWFDefinition.Id));
 
                         // Perform workflow analysis
-                        var workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(listWFDefinition.Xaml, WorkflowTypes.SP2013);
+                        var workFlowAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowDefinition(listWFDefinition.Xaml, WorkflowTypes.SP2013);
                         
-                        var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartManually"));
+                        var workFlowTriggerAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowTriggers(GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnCreate"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartOnChange"), GetWorkflowPropertyBool(listWFDefinition.Properties, "SPDConfig.StartManually"));
 
                         if (listWorkflowSubscriptions.Count() > 0)
                         {
@@ -293,19 +283,8 @@ namespace Discovery
                                     LastDefinitionEdit = GetWorkflowPropertyDateTime(listWFDefinition.Properties, "Definition.ModifiedDateUTC"),
                                     LastSubscriptionEdit = GetWorkflowPropertyDateTime(listWorkflowSubscription.PropertyDefinitions, "SharePointWorkflowContext.Subscription.ModifiedDateUTC"),
                                 };
-                                ops.AddRowToDataTable(workflowScanResult, dt, "2013", "List",listWFDefinition.DisplayName,listWFDefinition.Id.ToString(), false,web);
+                                reportGen.AddRowToDataTable(workflowScanResult, dt, "2013", "List",listWFDefinition.DisplayName,listWFDefinition.Id.ToString(), false,web);
 
-                                //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
-                                //{
-                                //    ScanError error = new ScanError()
-                                //    {
-                                //        Error = $"Could not add 2013 list workflow scan result for {workflowScanResult.SiteColUrl}",
-                                //        SiteColUrl = this.SiteCollectionUrl,
-                                //        SiteURL = this.SiteUrl,
-                                //        Field1 = "WorkflowAnalyzer",
-                                //    };
-                                //    this.ScanJob.ScanErrors.Push(error);
-                                //}
                             }
                         }
                         else
@@ -337,18 +316,8 @@ namespace Discovery
                                 UnsupportedActionCount = workFlowAnalysisResult != null ? workFlowAnalysisResult.UnsupportedAccountCount : 0,
                                 LastDefinitionEdit = GetWorkflowPropertyDateTime(listWFDefinition.Properties, "Definition.ModifiedDateUTC"),
                             };
-                            ops.AddRowToDataTable(workflowScanResult, dt, "2013", "Site",listWFDefinition.DisplayName,listWFDefinition.Id.ToString(), false,web);
-                            //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
-                            //{
-                            //    ScanError error = new ScanError()
-                            //    {
-                            //        Error = $"Could not add 2013 list workflow scan result for {workflowScanResult.SiteColUrl}",
-                            //        SiteColUrl = this.SiteCollectionUrl,
-                            //        SiteURL = this.SiteUrl,
-                            //        Field1 = "WorkflowAnalyzer",
-                            //    };
-                            //    this.ScanJob.ScanErrors.Push(error);
-                            //}
+                            reportGen.AddRowToDataTable(workflowScanResult, dt, "2013", "Site",listWFDefinition.DisplayName,listWFDefinition.Id.ToString(), false,web);
+
                         }
                     }
                 }
@@ -415,7 +384,7 @@ namespace Discovery
                             var loadedWorkflow = LoadWorkflowDefinition(cc, workflowTemplate);
                             if (!string.IsNullOrEmpty(loadedWorkflow?.Item1))
                             {
-                                workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
+                                workFlowAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
                             }
 
                             foreach (var associatedWorkflow in associatedWorkflows)
@@ -429,7 +398,7 @@ namespace Discovery
                                     continue;
                                 }
 
-                                var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(associatedWorkflow.WorkflowAssociation.AutoStartCreate, associatedWorkflow.WorkflowAssociation.AutoStartChange, associatedWorkflow.WorkflowAssociation.AllowManual);
+                                var workFlowTriggerAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowTriggers(associatedWorkflow.WorkflowAssociation.AutoStartCreate, associatedWorkflow.WorkflowAssociation.AutoStartChange, associatedWorkflow.WorkflowAssociation.AllowManual);
 
                                 WorkflowScanResult workflowScanResult = new WorkflowScanResult()
                                 {
@@ -463,7 +432,7 @@ namespace Discovery
                                     AutoStartChange = associatedWorkflow.WorkflowAssociation.AutoStartChange,
                                     AutoStartCreate = associatedWorkflow.WorkflowAssociation.AutoStartCreate,
                                 };
-                                ops.AddRowToDataTable(workflowScanResult, dt, "2010", associatedWorkflow.Scope, workflowTemplate.Name, workflowTemplate.Id.ToString(), IsOOBWorkflow(workflowTemplate.Id.ToString()),web);
+                                reportGen.AddRowToDataTable(workflowScanResult, dt, "2010", associatedWorkflow.Scope, workflowTemplate.Name, workflowTemplate.Id.ToString(), IsOOBWorkflow(workflowTemplate.Id.ToString()),web);
                             }
                         }
                         else
@@ -476,11 +445,11 @@ namespace Discovery
                                 var loadedWorkflow = LoadWorkflowDefinition(cc, workflowTemplate);
                                 if (!string.IsNullOrEmpty(loadedWorkflow?.Item1))
                                 {
-                                    workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
+                                    workFlowAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
                                 }
 
 
-                                var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(workflowTemplate.AutoStartCreate, workflowTemplate.AutoStartChange, workflowTemplate.AllowManual);
+                                var workFlowTriggerAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowTriggers(workflowTemplate.AutoStartCreate, workflowTemplate.AutoStartChange, workflowTemplate.AllowManual);
 
                                 WorkflowScanResult workflowScanResult = new WorkflowScanResult()
                                 {
@@ -509,7 +478,7 @@ namespace Discovery
                                     AssociationData = "",
 
                                 };
-                                ops.AddRowToDataTable(workflowScanResult, dt, "2010", "", workflowTemplate.Name, workflowTemplate.Id.ToString(), IsOOBWorkflow(workflowTemplate.Id.ToString()),web);
+                                reportGen.AddRowToDataTable(workflowScanResult, dt, "2010", "", workflowTemplate.Name, workflowTemplate.Id.ToString(), IsOOBWorkflow(workflowTemplate.Id.ToString()),web);
                                 //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
                                 //{
                                 //    ScanError error = new ScanError()
@@ -545,10 +514,10 @@ namespace Discovery
                         var loadedWorkflow = LoadWorkflowDefinition(cc, associatedWorkflow.WorkflowAssociation);
                         if (!string.IsNullOrEmpty(loadedWorkflow?.Item1))
                         {
-                            workFlowAnalysisResult = WorkflowManager.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
+                            workFlowAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowDefinition(loadedWorkflow.Item1, WorkflowTypes.SP2010);
                         }
 
-                        var workFlowTriggerAnalysisResult = WorkflowManager.Instance.ParseWorkflowTriggers(associatedWorkflow.WorkflowAssociation.AutoStartCreate, associatedWorkflow.WorkflowAssociation.AutoStartChange, associatedWorkflow.WorkflowAssociation.AllowManual);
+                        var workFlowTriggerAnalysisResult = WorkflowAnalyzer.Instance.ParseWorkflowTriggers(associatedWorkflow.WorkflowAssociation.AutoStartCreate, associatedWorkflow.WorkflowAssociation.AutoStartChange, associatedWorkflow.WorkflowAssociation.AllowManual);
 
                         WorkflowScanResult workflowScanResult = new WorkflowScanResult()
                         {
@@ -581,7 +550,7 @@ namespace Discovery
                             AutoStartCreate = associatedWorkflow.WorkflowAssociation.AutoStartCreate,
 
                     };
-                        ops.AddRowToDataTable(workflowScanResult, dt, "2010", associatedWorkflow.Scope, associatedWorkflow.WorkflowAssociation.Name, Guid.Empty.ToString(), false,web);
+                        reportGen.AddRowToDataTable(workflowScanResult, dt, "2010", associatedWorkflow.Scope, associatedWorkflow.WorkflowAssociation.Name, Guid.Empty.ToString(), false,web);
                         //if (!this.ScanJob.WorkflowScanResults.TryAdd($"workflowScanResult.SiteURL.{Guid.NewGuid()}", workflowScanResult))
                         //{
                         //    ScanError error = new ScanError()
@@ -600,7 +569,8 @@ namespace Discovery
             }
             catch(Exception ex)
             {
-
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
         }
 
@@ -664,7 +634,8 @@ namespace Discovery
             }
             catch (Exception ex)
             {
-
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
 
             return null;
@@ -679,11 +650,11 @@ namespace Discovery
                 try
                 {
                    return GetFileInformation(cc.Web, $"{this.workflowList.RootFolder.ServerRelativeUrl}/{workflowTemplate.Name}/{workflowTemplate.Name}.xoml");
-                    // old code change to test     return GetFileInformation(cc.Web, $"/sites/complexsites/Workflows/{workflowTemplate.Name}/{workflowTemplate.Name}.xoml");
                 }
                 catch (Exception ex)
                 {
-
+                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
                 }
             }
 
@@ -709,7 +680,6 @@ namespace Discovery
 
         private static Tuple<string, DateTime> GetFileInformation(Web web, string serverRelativeUrl)
         {
-            //var file = web.GetFileByServerRelativePath(ResourcePath.FromDecodedUrl(serverRelativeUrl));
             var file = web.GetFileByServerRelativeUrl(serverRelativeUrl);
 
             web.Context.Load(file);
@@ -748,6 +718,7 @@ namespace Discovery
                 destination.Write(buffer, 0, bytesRead);
             } while (bytesRead != 0);
         }
+
         private bool IsOOBWorkflow(string workflowTemplateId)
         {
             if (!string.IsNullOrEmpty(workflowTemplateId))
