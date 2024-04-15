@@ -172,7 +172,7 @@ namespace Root
                     else if (assessmentScope.Equals("SiteCollectionsUrls"))
                     {
                         objonPrem.Scope = "SiteCollectionsUrls";
-                        objonPrem.Url = SiteCollectionURLFilePath;
+                        objonPrem.FilePath = SiteCollectionURLFilePath;
 
                     }
                     objonPrem.DownloadPath = AssessmentOutputFolder;
@@ -183,7 +183,8 @@ namespace Root
                     }
                     
                     // run the workflow scan
-                    dtWorkflowLocations = objonPrem.Scan();
+                    dtWorkflowLocations = objonPrem.Scan().ToDataTable();
+
                     //Save the CSV file
                     string csvFilePath = string.Concat(AssessmentOutputFolder, ops.summaryFolder, ops.summaryFile);
                     ops.WriteToCsvFile(dtWorkflowLocations, csvFilePath);

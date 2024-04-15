@@ -15,6 +15,10 @@ namespace WorkflowScanner.Models
             this.LastSubscriptionEdit = DateTime.MinValue;
             this.LastDefinitionEdit = DateTime.MinValue;
         }
+        public string WFID { get; set; }
+        public string WebId { get; set; }
+        public string WebUrl { get; set; }
+        public string WorkflowTemplateName { get; set; }
 
         public string CreatedBy { get; set; }
 
@@ -92,8 +96,7 @@ namespace WorkflowScanner.Models
         {
             get; set;
         }
-        // calculates Flow Mapping Percentage 
-        // item.Value.ToFLowMappingPercentage
+
         public int ToFLowMappingPercentage
         {
             get

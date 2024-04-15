@@ -4,9 +4,72 @@ using System.Text;
 using System.Data;
 using Microsoft.SharePoint.Client;
 using WorkflowScanner.Models;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.IdentityModel.Protocols.WSIdentity;
+using PnP.Core.Model.SharePoint;
+using System.Xml.Linq;
 
 namespace Common
 {
+    public static class WorkflowScanResultExtensions
+    {
+        public static DataTable ToDataTable(this List<WorkflowScanResult> results)
+        {
+            DataTable dt = new DataTable();
+
+            foreach (WorkflowScanResult workflowScanResult in results)
+            {
+                DataRow dr = dt.NewRow();
+                try
+                {
+                    dr["SiteURL"] = workflowScanResult.SiteURL;
+                    dr["SiteCollID"] = workflowScanResult.SiteCollID;
+                    dr["WebURL"] = workflowScanResult.WebUrl;
+                    dr["ListTitle"] = workflowScanResult.ListTitle;
+                    dr["ListUrl"] = workflowScanResult.ListUrl;
+                    dr["ContentTypeId"] = workflowScanResult.ContentTypeId;
+                    dr["ContentTypeName"] = workflowScanResult.ContentTypeName;
+                    dr["Scope"] = workflowScanResult.Scope;
+                    dr["Version"] = workflowScanResult.Version;
+                    dr["WFTemplateName"] = workflowScanResult.WorkflowTemplateName;
+                    dr["WorkFlowName"] = workflowScanResult.SubscriptionName;
+                    dr["IsOOBWorkflow"] = workflowScanResult.IsOOBWorkflow;
+                    dr["Enabled"] = workflowScanResult.Enabled;   // adding for is enabled 
+                    dr["WFID"] = workflowScanResult.DefinitionId;
+                    dr["WebID"] = workflowScanResult.WebId;
+                    dr["HasSubscriptions"] = workflowScanResult.HasSubscriptions;   // adding for subscriptions 
+                    dr["UsedActions"] = FormatUsedActions(workflowScanResult.UsedActions);   // adding for UsedActions
+                    dr["ToFLowMappingPercentage"] = workflowScanResult.ToFLowMappingPercentage;   // adding for percentange upgradable to flow 
+                    dr["ConsiderUpgradingToFlow"] = workflowScanResult.ConsiderUpgradingToFlow;   // adding for consider upgrading to flow 
+                    dr["ActionCount"] = workflowScanResult.ActionCount;   // adding for ActionCount
+                    dr["AllowManual"] = workflowScanResult.AllowManual;
+                    dr["AutoStartChange"] = workflowScanResult.AutoStartChange;
+                    dr["AutoStartCreate"] = workflowScanResult.AutoStartCreate;
+                    dr["LastDefinitionModifiedDate"] = workflowScanResult.LastDefinitionEdit;
+                    dr["LastSubsrciptionModifiedDate"] = workflowScanResult.LastSubscriptionEdit;
+                    dr["AssociationData"] = workflowScanResult.AssociationData;
+
+                    dt.Rows.Add(dr);
+                }
+                catch (Exception ex)
+                {
+                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
+
+                }
+            }
+
+            return dt;
+
+        }
+
+        private static string FormatUsedActions(List<string> actions)
+        {
+            return actions != null ? actions.Aggregate((current, next) => current + "; " + next) : "";
+        }
+    }
+
 
     public class ReportGeneration
 
@@ -25,48 +88,6 @@ namespace Common
         public string compOutputFile = @"\WorkflowComparison.csv";
         public DataTable dt = new DataTable();
 
-        /// <summary>
-        /// Create Data Table
-        /// </summary>
-        /// <param name="dt"></param>
-        public void CreateDataTableColumns(DataTable dt)
-        {
-            try
-            {
-                dt.Columns.Add("SiteColID");
-                dt.Columns.Add("SiteURL");
-                dt.Columns.Add("ListTitle");
-                dt.Columns.Add("ListUrl");
-                dt.Columns.Add("ContentTypeId");
-                dt.Columns.Add("ContentTypeName");
-                dt.Columns.Add("Scope");
-                dt.Columns.Add("Version");
-                dt.Columns.Add("WFTemplateName");
-                dt.Columns.Add("WorkFlowName");
-                dt.Columns.Add("IsOOBWorkflow");
-                dt.Columns.Add("WFID");
-                dt.Columns.Add("WebID");
-                dt.Columns.Add("WebURL");
-                dt.Columns.Add("Enabled");
-                dt.Columns.Add("HasSubscriptions");
-                dt.Columns.Add("ConsiderUpgradingToFlow");
-                dt.Columns.Add("ToFLowMappingPercentage");
-                dt.Columns.Add("UsedActions");
-                dt.Columns.Add("ActionCount");
-                dt.Columns.Add("AllowManual");
-                dt.Columns.Add("AutoStartChange");
-                dt.Columns.Add("AutoStartCreate");
-                dt.Columns.Add("LastDefinitionModifiedDate");
-                dt.Columns.Add("LastSubsrciptionModifiedDate");
-                dt.Columns.Add("AssociationData");
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-
-            }
-        }
 
         /// <summary>
         /// Create Data Table
@@ -77,39 +98,30 @@ namespace Common
             DataRow dr = dt.NewRow();
             try
             {
-                if (workflowScanResult.SiteColUrl == null && web.Url != null)
+                if (workflowScanResult.SiteCollID == null && web.Url != null)
                 {
                     dr["SiteURL"] = web.Url;
                     dr["SiteColID"] = web.Id;
                 }
                 else
-                dr["SiteURL"] = workflowScanResult.SiteColUrl;
+                dr["SiteURL"] = workflowScanResult.SiteCollID;
                 dr["WebURL"] = web.Url;
                 dr["ListTitle"] = workflowScanResult.ListTitle;
                 dr["ListUrl"] = workflowScanResult.ListUrl;
                 dr["ContentTypeId"] = workflowScanResult.ContentTypeId;
                 dr["ContentTypeName"] = workflowScanResult.ContentTypeName;
-                dr["Scope"] = scope;
+                dr["Scope"] = workflowScanResult.Scope;
                 dr["Version"] = version;
                 dr["WFTemplateName"] = wfName;
                 dr["WorkFlowName"] = workflowScanResult.SubscriptionName;
                 dr["IsOOBWorkflow"] = IsOOBWF;
                 dr["Enabled"] = workflowScanResult.Enabled;   // adding for is enabled 
-                dr["WFID"] = wfID;
+                dr["WFID"] = workflowScanResult.WFID;
                 dr["WebID"] = web.Id;
                 dr["HasSubscriptions"] = workflowScanResult.HasSubscriptions;   // adding for subscriptions 
-                string sUsedActions = "";
-                // AM need to refactor into a helper function
-                if (workflowScanResult.UsedActions != null)
-                {
-                    foreach (var item in workflowScanResult.UsedActions)
-                    {
-                        sUsedActions = item.ToString()+";"+ sUsedActions;
-                    }
-                }
+                dr["UsedActions"] = FormatUsedActions(workflowScanResult.UsedActions);   // adding for UsedActions
                 dr["ToFLowMappingPercentage"] = workflowScanResult.ToFLowMappingPercentage;   // adding for percentange upgradable to flow 
                 dr["ConsiderUpgradingToFlow"] = workflowScanResult.ConsiderUpgradingToFlow;   // adding for consider upgrading to flow 
-                dr["UsedActions"] = sUsedActions;   // adding for UsedActions
                 dr["ActionCount"] = workflowScanResult.ActionCount;   // adding for ActionCount
                 dr["AllowManual"] = workflowScanResult.AllowManual;
                 dr["AutoStartChange"] = workflowScanResult.AutoStartChange;
@@ -126,6 +138,11 @@ namespace Common
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
 
             }
+        }
+
+        public string FormatUsedActions(List<string> actions)
+        {
+            return actions != null ? actions.Aggregate((current, next) => current + "; " + next) : "";
         }
 
         /// <summary>

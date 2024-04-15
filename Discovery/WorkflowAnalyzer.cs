@@ -12,7 +12,7 @@ using WorkflowScanner.Models;
 namespace Discovery
 {
     /// <summary>
-    /// Class to handle workflow analysis
+    /// Class to handle workflow analysis against Power Automate as a target
     /// </summary>
     public sealed class WorkflowAnalyzer
     {
@@ -332,7 +332,6 @@ namespace Discovery
             }
 
             var wfModelString = "";
-            // using (Stream stream = typeof(WorkflowManager).Assembly.GetManifestResourceStream(fileName))
             using (Stream stream = typeof(WorkflowAction).Assembly.GetManifestResourceStream(fileName))
             { 
                 using (StreamReader reader = new StreamReader(stream))

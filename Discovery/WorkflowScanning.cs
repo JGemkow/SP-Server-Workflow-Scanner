@@ -7,6 +7,8 @@ using System.IO;
 using System.Net;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
+using WorkflowScanner.Models;
+using System.Linq;
 
 
 namespace Discovery
@@ -14,6 +16,7 @@ namespace Discovery
     public class WorkflowScanning
     {
         public string Url { get; set; }
+        public string FilePath { get; set; }
         public string Scope { get; set; }
         public bool OnPrem { get; set; }
         public string DownloadPath { get; set; }
@@ -24,15 +27,18 @@ namespace Discovery
         public DirectoryInfo analysisFolder;
         public DirectoryInfo downloadedFormsFolder;
         public DirectoryInfo summaryFolder;
-        public DataTable dt = new DataTable();
 
-        public DataTable Scan()
+        public DataTable dt = new DataTable();
+        public List<WorkflowScanResult> Results = new List<WorkflowScanResult>();
+
+        public List<WorkflowScanResult> Scan()
         {
             List<string> siteCollectionsUrl = new List<string>();
             try
             {
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "Starting to analyze on-premise environment");
-                CreateDataTableColumns(dt);
+                
+                // JG CreateDataTableColumns(dt);
                 Console.WriteLine(System.Environment.NewLine);
                 Console.WriteLine("Starting to analyze on-premise environment");
 
@@ -42,7 +48,7 @@ namespace Discovery
                 }
                 else if (Scope == "WebApplication")
                 {
-                    siteCollectionsUrl = GetAllWebAppSites();
+                    siteCollectionsUrl = GetAllWebAppSites(Url);
 
                 }
                 else if (Scope == "SiteCollection")
@@ -51,57 +57,25 @@ namespace Discovery
                 }
                 else if (Scope == "SiteCollectionsUrls")
                 {
-                    siteCollectionsUrl = GetAllWebAppSitesFromUrl(Url);
+                    siteCollectionsUrl = GetSiteCollectionsFromFile(FilePath);
                 }
-                FindWorkflows(siteCollectionsUrl);
 
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "***********************************************************************");
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "TOTAL WORKFLOWS DISCOVERED : " + dt.Rows.Count.ToString());
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "***********************************************************************");
 
+                return FindWorkflows(siteCollectionsUrl);
+
             }
             catch (Exception ex)
             {
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-
+                return new List<WorkflowScanResult>();
             }
-            return dt;
         }
 
-
-        // used with list of site collections in CSV format
-        public List<string> GetAllWebAppSitesFromCSV()
-        {
-            List<string> webAppSiteCollectionUrls = new List<string>();
-            try
-            {
-                SPWebApplication objWebApp = null;
-                objWebApp = SPWebApplication.Lookup(new Uri(Url));
-                if (objWebApp == null)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine("Unable to obtain the object for the Web Application URL provided. Check to make sure the URL provided is correct.");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Logging.GetInstance().WriteToLogFile(Logging.Error, "Unable to obtain the object for the Web Application URL provided. SPWebApplication.Lookup(new Uri(Url)) returned NULL");
-                }
-                else
-                {
-                    foreach (SPSite site in objWebApp.Sites)
-                    {
-                        webAppSiteCollectionUrls.Add(site.Url);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-            }
-            return webAppSiteCollectionUrls;
-        }
-
-        private List<string> GetAllWebAppSitesFromUrl(string filePath)
+        private List<string> GetSiteCollectionsFromFile(string filePath)
         {
             List<string> siteCollectionUrls = new List<string>();
 
@@ -127,13 +101,14 @@ namespace Discovery
             return siteCollectionUrls;
 
         }
-        public List<string> GetAllWebAppSites()
+
+        public List<string> GetAllWebAppSites(string url)
         {
             List<string> webAppSiteCollectionUrls = new List<string>();
             try
             {
                 SPWebApplication objWebApp = null;
-                objWebApp = SPWebApplication.Lookup(new Uri(Url));
+                objWebApp = SPWebApplication.Lookup(new Uri(url));
                 if (objWebApp == null)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkMagenta;
@@ -162,55 +137,47 @@ namespace Discovery
         public List<string> QueryFarm()
         {
             List<string> farmSiteCollectionUrls = new List<string>();
+
             try
             {
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "Starting to query the farm..");
                 SPServiceCollection services = SPFarm.Local.Services;
                 foreach (SPService curService in services)
                 {
-                    try
+                    if (curService is SPWebService)
                     {
-                        if (curService is SPWebService)
+                        var webService = (SPWebService)curService;
+                        if (curService.TypeName.Equals("Microsoft SharePoint Foundation Web Application"))
                         {
-                            var webService = (SPWebService)curService;
-                            if (curService.TypeName.Equals("Microsoft SharePoint Foundation Web Application"))
+                            webService = (SPWebService)curService;
+                            SPWebApplicationCollection webApplications = webService.WebApplications;
+                            foreach (SPWebApplication webApplication in webApplications)
                             {
-                                webService = (SPWebService)curService;
-                                SPWebApplicationCollection webApplications = webService.WebApplications;
-                                foreach (SPWebApplication webApplication in webApplications)
+                                if (webApplication != null)
                                 {
-                                    if (webApplication != null)
+                                    if (false)
                                     {
-                                        if (false)
-                                        {
 
-                                        }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        foreach (SPSite site in webApplication.Sites)
                                         {
-                                            foreach (SPSite site in webApplication.Sites)
+                                            try
                                             {
-                                                try
-                                                {
-                                                    farmSiteCollectionUrls.Add(site.Url);
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                                                    Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-                                                    Console.WriteLine("Errored ! See log for details");
-                                                }
+                                                farmSiteCollectionUrls.Add(site.Url);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Logging.GetInstance().WriteToLogFile(Logging.Error, "Errored! See log for details");
+                                                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
+                                                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                        Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
                     }
                 }
             }
@@ -219,10 +186,14 @@ namespace Discovery
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
+
             return farmSiteCollectionUrls;
         }
-        public void FindWorkflows(List<string> sitecollectionUrls)
+
+        public List<WorkflowScanResult> FindWorkflows(List<string> sitecollectionUrls)
         {
+            List<WorkflowScanResult> results = new List<WorkflowScanResult>();
+
             try
             {
                 foreach (string url in sitecollectionUrls)
@@ -230,7 +201,7 @@ namespace Discovery
                     ClientContext siteClientContext = null;
                     if (Credential != null)
                     {
-                        siteClientContext = CreateClientContext(url, Credential, DomainName);
+                        siteClientContext = CreateClientContext(url, Credential);
                     }
                     else
                     {
@@ -247,7 +218,7 @@ namespace Discovery
                             siteClientContext.ExecuteQueryRetry();
                             hasPermissions = true;
                         }
-                        catch (System.Net.WebException webException)
+                        catch (WebException webException)
                         {
                             Console.WriteLine(string.Format(webException.Message.ToString() + " on " + url));
                             Logging.GetInstance().WriteToLogFile(Logging.Error, webException.Message.ToString() + " on " + url);
@@ -269,8 +240,10 @@ namespace Discovery
                             Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.StackTrace);
                         }
 
+                        // Skip if did not have permissions
                         if (!hasPermissions)
                             continue;
+
                         Console.WriteLine(string.Format("Attempting to fetch all the sites and sub sites of  " + url));
                         IEnumerable<string> expandedSites = siteClientContext.Site.GetAllSubSites();
 
@@ -280,14 +253,13 @@ namespace Discovery
                             {
                                 try
                                 {
-                                    FindWorkflowPerSite(ccWeb);
+                                    results.Concat(FindWorkflowPerSite(ccWeb));
                                 }
                                 catch (Microsoft.SharePoint.Client.ServerUnauthorizedAccessException unauthorizedException)
                                 {
                                     Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.Message);
                                     Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.StackTrace);
                                     Logging.GetInstance().WriteToLogFile(Logging.Error, unauthorizedException.Message.ToString() + " on " + url);
-                                    Console.WriteLine(string.Format(unauthorizedException.Message.ToString() + " on " + url));
                                 }
                             }
                         }
@@ -299,9 +271,11 @@ namespace Discovery
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
             }
+
+            return results;
         }
 
-        public void FindWorkflowPerSite(ClientContext cc)
+        public List<WorkflowScanResult> FindWorkflowPerSite(ClientContext cc)
         {
             try
             {
@@ -315,22 +289,31 @@ namespace Discovery
 
                 WorkflowAnalyzer.Instance.LoadWorkflowDefaultActions();
 
+                // Set up new WF discovery object for this site
                 WorkflowDiscovery wfDisc = new WorkflowDiscovery();
-                wfDisc.DiscoverWorkflows(cc, dt);
+                return wfDisc.DiscoverWorkflows(cc);
             }
             catch (Exception ex)
             {
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
+                return new List<WorkflowScanResult>();
             }
         }
 
-        internal ClientContext CreateClientContext(string url, NetworkCredential credential, string domainName)
+        internal ClientContext CreateClientContext(string url, NetworkCredential credential = null)
         {
             ClientContext cc = new ClientContext(url);
             try
             {
-                cc.Credentials = credential;
+                if (credential == null)
+                {
+                    cc.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+                }
+                else
+                {
+                    cc.Credentials = credential;
+                }
                 Web web = cc.Web;
                 cc.Load(web, website => website.Title);
                 cc.ExecuteQuery();
@@ -339,71 +322,11 @@ namespace Discovery
             {
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
                 Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-                return new ClientContext(url)
-                {
-                };
+
+                // Return ClientContext with url even though it will be unusable
+                return new ClientContext(url);
             }
             return cc;
-        }
-
-        internal ClientContext CreateClientContext(string url)
-        {
-            ClientContext cc = new ClientContext(url);
-            cc.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-            try
-            {
-                Web web = cc.Web;
-                cc.Load(web, website => website.Title);
-                cc.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-                return new ClientContext(url)
-                {
-                };
-            }
-            return cc;
-        }
-
-        public void CreateDataTableColumns(DataTable dt)
-        {
-            try
-            {
-                dt.Columns.Add("SiteColID");
-                dt.Columns.Add("SiteURL");
-                dt.Columns.Add("ListTitle");
-                dt.Columns.Add("ListUrl");
-                dt.Columns.Add("ContentTypeId");
-                dt.Columns.Add("ContentTypeName");
-                dt.Columns.Add("Scope");
-                dt.Columns.Add("Version");
-                dt.Columns.Add("WFTemplateName");
-                dt.Columns.Add("WorkFlowName");
-                dt.Columns.Add("IsOOBWorkflow");
-                dt.Columns.Add("WFID");
-                dt.Columns.Add("WebID");
-                dt.Columns.Add("WebURL");
-                dt.Columns.Add("Enabled");
-                dt.Columns.Add("HasSubscriptions");
-                dt.Columns.Add("ConsiderUpgradingToFlow");
-                dt.Columns.Add("ToFLowMappingPercentage");
-                dt.Columns.Add("UsedActions");
-                dt.Columns.Add("ActionCount");
-                dt.Columns.Add("AllowManual");
-                dt.Columns.Add("AutoStartChange");
-                dt.Columns.Add("AutoStartCreate");
-                dt.Columns.Add("LastDefinitionModifiedDate");
-                dt.Columns.Add("LastSubsrciptionModifiedDate");
-                dt.Columns.Add("AssociationData");
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-
-            }
         }
     }
 }

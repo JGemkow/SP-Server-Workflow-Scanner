@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common.Models
+﻿namespace Common.Models
 {
     
     /// <summary>
@@ -13,6 +7,6 @@ namespace Common.Models
     public class Scan
     {
         public string SiteURL { get; set; }
-        public string SiteColUrl { get; set; }
+        public string SiteCollID { get; set; }
     }
 }
