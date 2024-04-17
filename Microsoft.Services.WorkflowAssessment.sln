@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root", "Root\Root.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowScanner", "Discovery\WorkflowScanner.csproj", "{66180571-9292-4411-8B01-B31DCE2CC0E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{289A0F1F-1855-446D-BA59-1BD76F56BF56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{66180571-9292-4411-8B01-B31DCE2CC0E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66180571-9292-4411-8B01-B31DCE2CC0E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66180571-9292-4411-8B01-B31DCE2CC0E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{289A0F1F-1855-446D-BA59-1BD76F56BF56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{289A0F1F-1855-446D-BA59-1BD76F56BF56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{289A0F1F-1855-446D-BA59-1BD76F56BF56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{289A0F1F-1855-446D-BA59-1BD76F56BF56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -324,11 +324,11 @@ namespace Discovery
 
             if (wfType == WorkflowTypes.SP2010)
             {
-                  fileName = "WorkflowScanner.sp2010wfmodel.xml";
+                  fileName = "Discovery.sp2010wfmodel.xml";
             }
             else if (wfType == WorkflowTypes.SP2013)
             {
-                fileName = "WorkflowScanner.sp2013wfmodel.xml";
+                fileName = "Discovery.sp2013wfmodel.xml";
             }
 
             var wfModelString = "";

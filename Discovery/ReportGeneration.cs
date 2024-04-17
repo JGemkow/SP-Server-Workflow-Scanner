@@ -6,9 +6,6 @@ using Microsoft.SharePoint.Client;
 using WorkflowScanner.Models;
 using System.Linq;
 using System.Collections.Generic;
-using Microsoft.IdentityModel.Protocols.WSIdentity;
-using PnP.Core.Model.SharePoint;
-using System.Xml.Linq;
 
 namespace Common
 {

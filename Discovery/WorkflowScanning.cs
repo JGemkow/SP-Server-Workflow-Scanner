@@ -20,8 +20,6 @@ namespace Discovery
         public string Scope { get; set; }
         public bool OnPrem { get; set; }
         public string DownloadPath { get; set; }
-        public bool DownloadForms { get; set; }
-        public string DomainName { get; set; }
         public NetworkCredential Credential {get;set;}
 
         public DirectoryInfo analysisFolder;
@@ -215,7 +213,7 @@ namespace Discovery
 
                         {
                             Console.WriteLine(string.Format("Processing: " + url));
-                            siteClientContext.ExecuteQueryRetry();
+                            siteClientContext.ExecuteQuery();
                             hasPermissions = true;
                         }
                         catch (WebException webException)
@@ -253,7 +251,7 @@ namespace Discovery
                             {
                                 try
                                 {
-                                    results.Concat(FindWorkflowPerSite(ccWeb));
+                                    results = results.Union(FindWorkflowPerSite(ccWeb)).ToList();
                                 }
                                 catch (Microsoft.SharePoint.Client.ServerUnauthorizedAccessException unauthorizedException)
                                 {
@@ -281,11 +279,11 @@ namespace Discovery
             {
                 var site = cc.Site;
                 cc.Load(site);
-                cc.ExecuteQueryRetry();
+                cc.ExecuteQuery();
 
                 var web = cc.Web;
                 cc.Load(web);
-                cc.ExecuteQueryRetry();
+                cc.ExecuteQuery();
 
                 WorkflowAnalyzer.Instance.LoadWorkflowDefaultActions();
 
