@@ -9,6 +9,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using WorkflowScanner.Models;
 using System.Linq;
+using Common.Models;
 
 
 namespace Discovery
@@ -17,7 +18,8 @@ namespace Discovery
     {
         public string Url { get; set; }
         public string FilePath { get; set; }
-        public string Scope { get; set; }
+        
+        public AnalysisScope Scope { get; set; }
         public bool OnPrem { get; set; }
         public string DownloadPath { get; set; }
         public NetworkCredential Credential {get;set;}
@@ -40,20 +42,20 @@ namespace Discovery
                 Console.WriteLine(System.Environment.NewLine);
                 Console.WriteLine("Starting to analyze on-premise environment");
 
-                if (Scope == "Farm")
+                if (Scope == AnalysisScope.Farm)
                 {
                     siteCollectionsUrl = QueryFarm();
                 }
-                else if (Scope == "WebApplication")
+                else if (Scope == AnalysisScope.WebApplication)
                 {
                     siteCollectionsUrl = GetAllWebAppSites(Url);
 
                 }
-                else if (Scope == "SiteCollection")
+                else if (Scope == AnalysisScope.SiteCollection)
                 {
                     siteCollectionsUrl.Add(Url);
                 }
-                else if (Scope == "SiteCollectionsUrls")
+                else if (Scope == AnalysisScope.SiteCollectionsUrls)
                 {
                     siteCollectionsUrl = GetSiteCollectionsFromFile(FilePath);
                 }
