@@ -7,6 +7,7 @@ using System.Security;
 using WorkflowScanner.Models;
 using System.Collections.Generic;
 using System.IO;
+using Common.Models;
 
 namespace ScannerTest
 {
@@ -38,7 +39,7 @@ namespace ScannerTest
 
             ops.CreateDirectoryStructure(AssessmentOutputFolder);
 
-            objonPrem.Scope = "SiteCollection";
+            objonPrem.Scope = AnalysisScope.SiteCollection;
             objonPrem.Url = System.Configuration.ConfigurationManager.AppSettings["TestSiteCollectionURL"];
             objonPrem.Credential = new NetworkCredential(System.Configuration.ConfigurationManager.AppSettings["TestUsername"], 
                 System.Configuration.ConfigurationManager.AppSettings["TestPassword"], 
