@@ -9,17 +9,52 @@ using System.Net;
 using Common.Models;
 
 
-namespace Root
+namespace PowerShell
 {
     /// <summary>
-    /// Commandlet to discover the Workflow Asssociations in 
-    /// Onpremise environments that are published to
-    /// list and document libraries
-    /// </summary>
-    /// <returns></returns>
-    ///
-
-    [Cmdlet(VerbsCommon.Get, "WorkflowAssociationsForOnprem", DefaultParameterSetName = "CurrentCredential-Farm")]
+    ///   Commandlet to discover the Workflow Asssociations in 
+    ///   on-premises environments that are published to
+    ///   list and document libraries
+    /// </summary
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionURLFilePath .\sites.csv</code>
+    /// <para>Using credentials of current logged in user, scan all sites in the sites.csv.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionURLFilePath .\sites.csv -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain,scan all sites in the sites.csv.</para>
+    /// </example>
+    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123"</code>
+    /// <para>Using credentials of current logged in user, scan the single Test123 site collection.</para>
+    /// </example
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain,scan the single Test123 site collection.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -WebApplicationUrl "https://sp2016.ad.xyz123domain.com"</code>
+    /// <para>Using a PSCredential object ($Cred), enumerate all sites in the provided web application and scan for workflow in the site collection.</para>
+    /// </example>
+    /// /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -WebApplicationUrl "https://sp2016.ad.xyz123domain.com" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain, enumerate all sites in the provided web application and scan for workflow in the site collection.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows</code>
+    /// <para>Using credentials of current logged in user, enumerate all sites in the farm. NOTE: This must be run on a SharePoint Server.</para>
+    /// </example>
+    /// <example>
+    /// <code>Get-SPWorkflowScannerWorkflows -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain, enumerate all sites in the farm. NOTE: This must be run on a SharePoint Server.</para>
+    /// </example>
+    /// <param name="DomainName">Name of the domain paired with a provided credential.</param>
+    /// <param name="Credential">Credential object used for authentication against SharePoint.</param>
+    /// <param name="SiteCollectionURLFilePath">Path to file containing URLs of site collections to be scanned.</param>
+    /// <param name="WebApplicationUrl">URL of the web application in SharePoint for sites to be enumerated and scanned.</param>
+    /// <param name="SiteCollectionUrl">URL of a single site collection in SharePoint to be scanned.</param>
+    /// <param name="AssessmentOutputFolder">Path to folder where assessment output should be stored.</param>
+    /// <output>Produces a WorkflowSummary.csv file listing detected workflows.</output>
+    [Cmdlet(VerbsCommon.Get, "SPWorkflowScannerWorkflows", DefaultParameterSetName = "CurrentCredential-Farm")]
     public class CmdGetWorkflowAssociationsForOnprem : PSCmdlet
     {
         [Parameter(Mandatory = true, ParameterSetName = "Credential-WebApplication", HelpMessage = "Specify the Domain name of the user account")]
