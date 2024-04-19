@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'Microsoft.Services.WorkflowAssessment.Root.dll'
+RootModule = 'Microsoft.Services.WorkflowAssessment.PowerShell.dll'
 
 # Version number of this module.
 ModuleVersion = '0.1'
@@ -72,7 +72,7 @@ DotNetFrameworkVersion = '4.6.1'
 FunctionsToExport = '*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'Get-SPWorkflowScannerWorkflows'
+CmdletsToExport = 'Get-Workflows'
 
 # Variables to export from this module
 VariablesToExport = '*'
