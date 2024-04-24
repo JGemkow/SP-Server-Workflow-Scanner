@@ -12,7 +12,7 @@
 RootModule = 'Microsoft.Services.WorkflowAssessment.PowerShell.dll'
 
 # Version number of this module.
-ModuleVersion = '0.1'
+ModuleVersion = '0.0.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -95,10 +95,10 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = @("SharePoint", "Workflow modernization", "SharePoint Server", "SharePoint 2016", "SharePoint 2013", "SharePoint 2010")
+        Tags = @("SharePoint", "Workflow-modernization", "SharePoint-Server", "SharePoint-2016", "SharePoint-2013", "SharePoint-2010")
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/JGemkow/SP-Server-Workflow-Scanner/blob/main/LICENSE'
+        LicenseUri = 'https://github.com/microsoft/SP-Server-Workflow-Scanner/blob/main/LICENSE'
 
         # A URL to the main website for this project.
         ProjectUri = 'https://github.com/microsoft/SP-Server-Workflow-Scanner'

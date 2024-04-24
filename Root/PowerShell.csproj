@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C36A3FF3-1A6B-4ACD-94FC-0BC798082603}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Root</RootNamespace>
     <AssemblyName>Microsoft.Services.WorkflowAssessment.Root</AssemblyName>
@@ -318,4 +318,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(ProjectDir)SPWorkflowScanner.psd1 $(ProjectDir)bin\$(ConfigurationName)\SPWorkflowScanner.psd1</PostBuildEvent>
+  </PropertyGroup>
 </Project>
