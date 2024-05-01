@@ -54,6 +54,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WebAppTest.cs" />
+    <Compile Include="FarmTest.cs" />
     <Compile Include="SingleSiteCollectionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

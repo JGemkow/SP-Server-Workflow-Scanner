@@ -12,10 +12,10 @@ using Common.Models;
 namespace ScannerTest
 {
     [TestClass]
-    public class SingleSiteCollectionTest
+    public class FarmTest
     {
         [TestMethod]
-        public void TestScanSingleSiteCollection()
+        public void TestScanFarm()
         {
             string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
             string logFolderPath;
@@ -39,15 +39,11 @@ namespace ScannerTest
 
             ops.CreateDirectoryStructure(AssessmentOutputFolder);
 
-            objonPrem.Scope = AnalysisScope.SiteCollection;
-            objonPrem.Url = System.Configuration.ConfigurationManager.AppSettings["TestSiteCollectionURL"];
-            objonPrem.Credential = new NetworkCredential(System.Configuration.ConfigurationManager.AppSettings["TestUsername"], 
-                System.Configuration.ConfigurationManager.AppSettings["TestPassword"], 
-                System.Configuration.ConfigurationManager.AppSettings["TestDomain"]);
+            objonPrem.Scope = AnalysisScope.Farm;
 
             List<WorkflowScanResult> results = objonPrem.Scan();
 
-            Assert.IsTrue(results.Count == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SingleSiteCollectionExpectedCount"]));
+            Assert.IsTrue(results.Count == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FarmExpectedCount"]));
         }
     }
 }
