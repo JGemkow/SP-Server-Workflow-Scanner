@@ -15,6 +15,33 @@ namespace Common
         {
             DataTable dt = new DataTable();
 
+            dt.Columns.Add("SiteURL", typeof(string));
+            dt.Columns.Add("SiteCollID", typeof(string));
+            dt.Columns.Add("WebURL", typeof(string));
+            dt.Columns.Add("ListTitle", typeof(string));
+            dt.Columns.Add("ListUrl", typeof(string));
+            dt.Columns.Add("ContentTypeId", typeof(string));
+            dt.Columns.Add("ContentTypeName", typeof(string));
+            dt.Columns.Add("Scope", typeof(string));
+            dt.Columns.Add("Version", typeof(string));
+            dt.Columns.Add("WFTemplateName", typeof(string));
+            dt.Columns.Add("WorkFlowName", typeof(string));
+            dt.Columns.Add("IsOOBWorkflow", typeof(string));
+            dt.Columns.Add("Enabled", typeof(string));
+            dt.Columns.Add("WFID", typeof(string));
+            dt.Columns.Add("WebID", typeof(string));
+            dt.Columns.Add("HasSubscriptions", typeof(string));
+            dt.Columns.Add("UsedActions", typeof(string));
+            dt.Columns.Add("ToFlowMappingPercentage", typeof(string));
+            dt.Columns.Add("ConsiderUpgradingToFlow", typeof(string));
+            dt.Columns.Add("ActionCount", typeof(string));
+            dt.Columns.Add("AllowManual", typeof(string));
+            dt.Columns.Add("AutoStartChange", typeof(string));
+            dt.Columns.Add("AutoStartCreate", typeof(string));
+            dt.Columns.Add("LastDefinitionModifiedDate", typeof(string));
+            dt.Columns.Add("LastSubsrciptionModifiedDate", typeof(string));
+            dt.Columns.Add("AssociationData", typeof(string));
+
             foreach (WorkflowScanResult workflowScanResult in results)
             {
                 DataRow dr = dt.NewRow();
@@ -37,7 +64,7 @@ namespace Common
                     dr["WebID"] = workflowScanResult.WebId;
                     dr["HasSubscriptions"] = workflowScanResult.HasSubscriptions;   // adding for subscriptions 
                     dr["UsedActions"] = FormatUsedActions(workflowScanResult.UsedActions);   // adding for UsedActions
-                    dr["ToFLowMappingPercentage"] = workflowScanResult.ToFLowMappingPercentage;   // adding for percentange upgradable to flow 
+                    dr["ToFlowMappingPercentage"] = workflowScanResult.ToFLowMappingPercentage;   // adding for percentange upgradable to flow 
                     dr["ConsiderUpgradingToFlow"] = workflowScanResult.ConsiderUpgradingToFlow;   // adding for consider upgrading to flow 
                     dr["ActionCount"] = workflowScanResult.ActionCount;   // adding for ActionCount
                     dr["AllowManual"] = workflowScanResult.AllowManual;
@@ -74,8 +101,6 @@ namespace Common
         /// <summary>
         /// SPO Properties
         /// </summary>
-        public string DownloadPath { get; set; }
-        public bool DownloadForms { get; set; }
         public string summaryFile = @"\WorkflowDiscovery.csv";
         public string logFolder = @"\Logs";
         public string downloadedFormsFolder = @"\DownloadedWorkflows";
@@ -84,58 +109,6 @@ namespace Common
         public string analysisOutputFile = @"\WorkflowComparisonDetails.csv";
         public string compOutputFile = @"\WorkflowComparison.csv";
         public DataTable dt = new DataTable();
-
-
-        /// <summary>
-        /// Create Data Table
-        /// </summary>
-        /// <param name="dt"></param>
-        public void AddRowToDataTable(WorkflowScanResult workflowScanResult, DataTable dt, string version, string scope, string wfName, string wfID, bool IsOOBWF, Web web)
-        {
-            DataRow dr = dt.NewRow();
-            try
-            {
-                if (workflowScanResult.SiteCollID == null && web.Url != null)
-                {
-                    dr["SiteURL"] = web.Url;
-                    dr["SiteColID"] = web.Id;
-                }
-                else
-                dr["SiteURL"] = workflowScanResult.SiteCollID;
-                dr["WebURL"] = web.Url;
-                dr["ListTitle"] = workflowScanResult.ListTitle;
-                dr["ListUrl"] = workflowScanResult.ListUrl;
-                dr["ContentTypeId"] = workflowScanResult.ContentTypeId;
-                dr["ContentTypeName"] = workflowScanResult.ContentTypeName;
-                dr["Scope"] = workflowScanResult.Scope;
-                dr["Version"] = version;
-                dr["WFTemplateName"] = wfName;
-                dr["WorkFlowName"] = workflowScanResult.SubscriptionName;
-                dr["IsOOBWorkflow"] = IsOOBWF;
-                dr["Enabled"] = workflowScanResult.Enabled;   // adding for is enabled 
-                dr["WFID"] = workflowScanResult.WFID;
-                dr["WebID"] = web.Id;
-                dr["HasSubscriptions"] = workflowScanResult.HasSubscriptions;   // adding for subscriptions 
-                dr["UsedActions"] = FormatUsedActions(workflowScanResult.UsedActions);   // adding for UsedActions
-                dr["ToFLowMappingPercentage"] = workflowScanResult.ToFLowMappingPercentage;   // adding for percentange upgradable to flow 
-                dr["ConsiderUpgradingToFlow"] = workflowScanResult.ConsiderUpgradingToFlow;   // adding for consider upgrading to flow 
-                dr["ActionCount"] = workflowScanResult.ActionCount;   // adding for ActionCount
-                dr["AllowManual"] = workflowScanResult.AllowManual;
-                dr["AutoStartChange"] = workflowScanResult.AutoStartChange;
-                dr["AutoStartCreate"] = workflowScanResult.AutoStartCreate;
-                dr["LastDefinitionModifiedDate"] = workflowScanResult.LastDefinitionEdit;
-                dr["LastSubsrciptionModifiedDate"] = workflowScanResult.LastSubscriptionEdit;
-                dr["AssociationData"] = workflowScanResult.AssociationData;
-
-                dt.Rows.Add(dr);
-            }
-            catch (Exception ex)
-            {
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.Message);
-                Logging.GetInstance().WriteToLogFile(Logging.Error, ex.StackTrace);
-
-            }
-        }
 
         public string FormatUsedActions(List<string> actions)
         {

@@ -91,6 +91,14 @@ namespace PowerShell
         [Parameter(Mandatory = true, ParameterSetName = "CurrentCredential-Farm", HelpMessage = @"The path where the Assessment Summary, logs, Workflow definitions are downloaded (if DownloadForms parameter is set to true) for analyzing (e.g. F:\temp\WorkflowDefinitions")]
         public string AssessmentOutputFolder;
 
+        [Parameter(Mandatory = false)]
+        public SwitchParameter Force
+        {
+            get { return _force; }
+            set { _force = value; }
+        }
+        private bool _force;
+
         private string assessmentScope;
         private static List<string> siteCollectionUrls = new List<string>();
         private string logFolderPath;
@@ -125,13 +133,20 @@ namespace PowerShell
         {
             try
             {
-                assessmentScope = ParameterSetName.Substring(ParameterSetName.IndexOf('-'), ParameterSetName.Length - ParameterSetName.IndexOf('-'));
+                assessmentScope = ParameterSetName.Substring(ParameterSetName.IndexOf('-')+1, ParameterSetName.Length - ParameterSetName.IndexOf('-') -1);
                 BeginToAssess();
             }
             catch (Exception ex)
             {
-                Host.UI.WriteLine(ConsoleColor.DarkRed, Host.UI.RawUI.BackgroundColor, ex.Message);
-            }
+                try
+                {
+                    Host.UI.WriteLine(ConsoleColor.DarkRed, Host.UI.RawUI.BackgroundColor, ex.Message);
+                }
+                catch (System.Management.Automation.Host.HostException)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+        }
         }
 
 
@@ -143,24 +158,34 @@ namespace PowerShell
                 //New Code Starts
                 string userInput = string.Empty;
                 Console.WriteLine(System.Environment.NewLine);
-                Host.UI.WriteLine(ConsoleColor.Cyan, Host.UI.RawUI.BackgroundColor, "The assessment is scoped to run at " + assessmentScope +
-                       " level. Would you like to proceed? [Y] to continue, [N] to abort.");
-                var op = this.InvokeCommand.InvokeScript("Read-Host");
-                userInput = op[0].ToString().Trim().ToLower();
-
-                while (!userInput.Equals("y") && !userInput.Equals("n"))
+                if (Force.IsPresent)
                 {
-                    Host.UI.WriteLine(ConsoleColor.Cyan, Host.UI.RawUI.BackgroundColor, "Invalid input. Press [Y] to continue, [N] to abort.");
-                    op = this.InvokeCommand.InvokeScript("Read-Host");
-                    userInput = op[0].ToString().ToLower();
-
+                    userInput = "y";
                 }
+                else
+                {
+                    while (!userInput.Equals("y") && !userInput.Equals("n"))
+                    {
+                        Host.UI.WriteLine(ConsoleColor.Cyan, Host.UI.RawUI.BackgroundColor, "Invalid input. Press [Y] to continue, [N] to abort.");
+                        var op = this.InvokeCommand.InvokeScript("Read-Host");
+                        userInput = op[0].ToString().ToLower();
+
+                    }
+                } 
+
                 if (userInput.Equals("y"))
                 {
                     WorkflowScanning objonPrem = new WorkflowScanning();
                     ops.CreateDirectoryStructure(AssessmentOutputFolder);
                     Console.WriteLine(System.Environment.NewLine);
-                    Host.UI.WriteLine(ConsoleColor.Yellow, Host.UI.RawUI.BackgroundColor, "Beginning assessment..");
+                    try
+                    {
+                        Host.UI.WriteLine(ConsoleColor.Yellow, Host.UI.RawUI.BackgroundColor, "Beginning assessment..");
+                    }
+                    catch (System.Management.Automation.Host.HostException)
+                    {
+                        Console.WriteLine("Beginning assessment..");
+                    }
 
                     switch (assessmentScope)
                     {
@@ -195,7 +220,8 @@ namespace PowerShell
                     //Set Credentials from user entry if provided
                     if (Credential != null)
                     {
-                        objonPrem.Credential = new NetworkCredential(Credential.UserName, Credential.Password.ToString(), DomainName);
+                        objonPrem.Credential = Credential.GetNetworkCredential();
+                        objonPrem.Credential.Domain = DomainName;
                     }
                     
                     // run the workflow scan
@@ -207,12 +233,26 @@ namespace PowerShell
                 }
                 else if (userInput.Equals("n"))
                 {
-                    Host.UI.WriteLine(ConsoleColor.Cyan, Host.UI.RawUI.BackgroundColor, "Operation aborted as per your input !");
+                    try
+                    {
+                        Host.UI.WriteLine(ConsoleColor.Cyan, Host.UI.RawUI.BackgroundColor, "Operation aborted as per your input !");
+                    }
+                    catch (System.Management.Automation.Host.HostException)
+                    {
+                        Console.WriteLine("Operation aborted as per your input !");
+                    }
                 }              
             }
             catch (Exception ex)
             {
-                Host.UI.WriteLine(ConsoleColor.DarkRed, Host.UI.RawUI.BackgroundColor, ex.Message);
+                try
+                {
+                    Host.UI.WriteLine(ConsoleColor.DarkRed, Host.UI.RawUI.BackgroundColor, ex.Message);
+                }
+                catch (System.Management.Automation.Host.HostException)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

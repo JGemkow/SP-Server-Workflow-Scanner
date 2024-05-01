@@ -60,11 +60,12 @@ namespace Discovery
                     siteCollectionsUrl = GetSiteCollectionsFromFile(FilePath);
                 }
 
+                List<WorkflowScanResult> workflows = FindWorkflows(siteCollectionsUrl);
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "***********************************************************************");
-                Logging.GetInstance().WriteToLogFile(Logging.Info, "TOTAL WORKFLOWS DISCOVERED : " + dt.Rows.Count.ToString());
+                Logging.GetInstance().WriteToLogFile(Logging.Info, "TOTAL WORKFLOWS DISCOVERED : " + workflows.Count.ToString());
                 Logging.GetInstance().WriteToLogFile(Logging.Info, "***********************************************************************");
 
-                return FindWorkflows(siteCollectionsUrl);
+                return workflows;
 
             }
             catch (Exception ex)

@@ -52,8 +52,13 @@
       <HintPath>..\packages\System.Configuration.ConfigurationManager.8.0.0\lib\net462\System.Configuration.ConfigurationManager.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PowerShellTests.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="WebAppTest.cs" />
     <Compile Include="FarmTest.cs" />
     <Compile Include="SingleSiteCollectionTest.cs" />
@@ -71,6 +76,10 @@
     <ProjectReference Include="..\Discovery\WorkflowScanner.csproj">
       <Project>{66180571-9292-4411-8b01-b31dce2cc0e8}</Project>
       <Name>WorkflowScanner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root\PowerShell.csproj">
+      <Project>{c36a3ff3-1a6b-4acd-94fc-0bc798082603}</Project>
+      <Name>PowerShell</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
