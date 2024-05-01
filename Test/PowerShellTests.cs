@@ -36,7 +36,7 @@ namespace ScannerTest
         }
 
         [TestMethod]
-        public void TestPowerShellSingleSiteCollection()
+        public void SingleSiteCollectionWithCredential()
         {
             using (var powershell = System.Management.Automation.PowerShell.Create())
             {
@@ -60,6 +60,135 @@ namespace ScannerTest
                 int rows = CountRowsInCsvFile(csvFilePath);
 
                 Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SingleSiteCollectionExpectedCount"]));
+            }
+        }
+
+        [TestMethod]
+        public void SingleSiteCollection()
+        {
+            using (var powershell = System.Management.Automation.PowerShell.Create())
+            {
+                string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
+
+                powershell.Runspace = _runspace;
+
+                var command = new Command("Get-SPWorkflowScannerWorkflows");
+                command.Parameters.Add("AssessmentOutputFolder", AssessmentOutputFolder);
+                command.Parameters.Add("SiteCollectionUrl", System.Configuration.ConfigurationManager.AppSettings["TestSiteCollectionURL"]);
+                command.Parameters.Add("Force");
+                powershell.Commands.AddCommand(command);
+
+                powershell.Invoke();
+
+                // Get rows in resulting file
+                string csvFilePath = GetLatestCsvFilePath($"{AssessmentOutputFolder}\\Summary");
+                int rows = CountRowsInCsvFile(csvFilePath);
+
+                Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["SingleSiteCollectionExpectedCount"]));
+            }
+        }
+
+        [TestMethod]
+        public void WebApplicationWithCredential()
+        {
+            using (var powershell = System.Management.Automation.PowerShell.Create())
+            {
+                string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
+
+                powershell.Runspace = _runspace;
+
+                var command = new Command("Get-SPWorkflowScannerWorkflows");
+                command.Parameters.Add("AssessmentOutputFolder", AssessmentOutputFolder);
+                command.Parameters.Add("WebApplicationUrl", System.Configuration.ConfigurationManager.AppSettings["TestWebApplicationURL"]);
+                command.Parameters.Add("DomainName", System.Configuration.ConfigurationManager.AppSettings["TestDomain"]);
+                command.Parameters.Add("Credential", new PSCredential(System.Configuration.ConfigurationManager.AppSettings["TestUsername"],
+                                      System.Configuration.ConfigurationManager.AppSettings["TestPassword"].ToSecureString()));
+                command.Parameters.Add("Force");
+                powershell.Commands.AddCommand(command);
+
+                powershell.Invoke();
+
+                // Get rows in resulting file
+                string csvFilePath = GetLatestCsvFilePath($"{AssessmentOutputFolder}\\Summary");
+                int rows = CountRowsInCsvFile(csvFilePath);
+
+                Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["WebAppExpectedCount"]));
+            }
+        }
+
+        [TestMethod]
+        public void WebApplication()
+        {
+            using (var powershell = System.Management.Automation.PowerShell.Create())
+            {
+                string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
+
+                powershell.Runspace = _runspace;
+
+                var command = new Command("Get-SPWorkflowScannerWorkflows");
+                command.Parameters.Add("AssessmentOutputFolder", AssessmentOutputFolder);
+                command.Parameters.Add("WebApplicationUrl", System.Configuration.ConfigurationManager.AppSettings["TestWebApplicationURL"]);
+                command.Parameters.Add("Force");
+                powershell.Commands.AddCommand(command);
+
+                powershell.Invoke();
+
+                // Get rows in resulting file
+                string csvFilePath = GetLatestCsvFilePath($"{AssessmentOutputFolder}\\Summary");
+                int rows = CountRowsInCsvFile(csvFilePath);
+
+                Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["WebAppExpectedCount"]));
+            }
+        }
+
+        [TestMethod]
+        public void FarmWithCredential()
+        {
+            using (var powershell = System.Management.Automation.PowerShell.Create())
+            {
+                string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
+
+                powershell.Runspace = _runspace;
+
+                var command = new Command("Get-SPWorkflowScannerWorkflows");
+                command.Parameters.Add("AssessmentOutputFolder", AssessmentOutputFolder);
+                command.Parameters.Add("DomainName", System.Configuration.ConfigurationManager.AppSettings["TestDomain"]);
+                command.Parameters.Add("Credential", new PSCredential(System.Configuration.ConfigurationManager.AppSettings["TestUsername"],
+                                      System.Configuration.ConfigurationManager.AppSettings["TestPassword"].ToSecureString()));
+                command.Parameters.Add("Force");
+                powershell.Commands.AddCommand(command);
+
+                powershell.Invoke();
+
+                // Get rows in resulting file
+                string csvFilePath = GetLatestCsvFilePath($"{AssessmentOutputFolder}\\Summary");
+                int rows = CountRowsInCsvFile(csvFilePath);
+
+                Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FarmExpectedCount"]));
+            }
+        }
+
+        [TestMethod]
+        public void Farm()
+        {
+            using (var powershell = System.Management.Automation.PowerShell.Create())
+            {
+                string AssessmentOutputFolder = System.Configuration.ConfigurationManager.AppSettings["AssessmentOutputFolder"];
+
+                powershell.Runspace = _runspace;
+
+                var command = new Command("Get-SPWorkflowScannerWorkflows");
+                command.Parameters.Add("AssessmentOutputFolder", AssessmentOutputFolder);
+                command.Parameters.Add("Force");
+                powershell.Commands.AddCommand(command);
+
+                powershell.Invoke();
+
+                // Get rows in resulting file
+                string csvFilePath = GetLatestCsvFilePath($"{AssessmentOutputFolder}\\Summary");
+                int rows = CountRowsInCsvFile(csvFilePath);
+
+                Assert.IsTrue(rows == Convert.ToInt32(System.Configuration.ConfigurationManager.AppSettings["FarmExpectedCount"]));
             }
         }
 
