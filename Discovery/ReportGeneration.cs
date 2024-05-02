@@ -39,7 +39,7 @@ namespace Common
             dt.Columns.Add("AutoStartChange", typeof(string));
             dt.Columns.Add("AutoStartCreate", typeof(string));
             dt.Columns.Add("LastDefinitionModifiedDate", typeof(string));
-            dt.Columns.Add("LastSubsrciptionModifiedDate", typeof(string));
+            dt.Columns.Add("LastSubscriptionModifiedDate", typeof(string));
             dt.Columns.Add("AssociationData", typeof(string));
 
             foreach (WorkflowScanResult workflowScanResult in results)
@@ -71,7 +71,7 @@ namespace Common
                     dr["AutoStartChange"] = workflowScanResult.AutoStartChange;
                     dr["AutoStartCreate"] = workflowScanResult.AutoStartCreate;
                     dr["LastDefinitionModifiedDate"] = workflowScanResult.LastDefinitionEdit;
-                    dr["LastSubsrciptionModifiedDate"] = workflowScanResult.LastSubscriptionEdit;
+                    dr["LastSubscriptionModifiedDate"] = workflowScanResult.LastSubscriptionEdit;
                     dr["AssociationData"] = workflowScanResult.AssociationData;
 
                     dt.Rows.Add(dr);

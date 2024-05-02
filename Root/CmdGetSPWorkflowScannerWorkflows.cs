@@ -55,7 +55,7 @@ namespace PowerShell
     /// <param name="AssessmentOutputFolder">Path to folder where assessment output should be stored.</param>
     /// <output>Produces a WorkflowSummary.csv file listing detected workflows.</output>
     [Cmdlet(VerbsCommon.Get, "SPWorkflowScannerWorkflows", DefaultParameterSetName = "CurrentCredential-Farm")]
-    public class CmdGetWorkflowAssociationsForOnprem : PSCmdlet
+    public class CmdGetSPWorkflowScannerWorkflows : PSCmdlet
     {
         [Parameter(Mandatory = true, ParameterSetName = "Credential-WebApplication", HelpMessage = "Specify the Domain name of the user account")]
         [Parameter(Mandatory = true, ParameterSetName = "Credential-SiteCollection", HelpMessage = "Specify the Domain name of the user account")]
@@ -73,8 +73,8 @@ namespace PowerShell
         [Parameter(Mandatory = true, ParameterSetName = "CurrentCredential-SiteCollectionUrls", HelpMessage = "Specify the file path of a text file containing target site collection URLs")]
         public string SiteCollectionURLFilePath;
 
-       [Parameter(Mandatory = true, ParameterSetName = "Credential-WebApplication", HelpMessage = "Specify the URL of the Web Application")]
-       [Parameter(Mandatory = true, ParameterSetName = "CurrentCredential-WebApplication", HelpMessage = "Specify the URL of the Web Application")]
+        [Parameter(Mandatory = true, ParameterSetName = "Credential-WebApplication", HelpMessage = "Specify the URL of the Web Application")]
+        [Parameter(Mandatory = true, ParameterSetName = "CurrentCredential-WebApplication", HelpMessage = "Specify the URL of the Web Application")]
         public string WebApplicationUrl;
 
         [Parameter(Mandatory = true, ParameterSetName = "Credential-SiteCollection", HelpMessage = "Specify the URL of the Site Collection")]

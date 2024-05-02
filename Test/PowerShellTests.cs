@@ -28,7 +28,7 @@ namespace ScannerTest
         {
             var initialSessionState = InitialSessionState.CreateDefault();
             initialSessionState.Commands.Add(
-                new SessionStateCmdletEntry("Get-SPWorkflowScannerWorkflows", typeof(CmdGetWorkflowAssociationsForOnprem), null)
+                new SessionStateCmdletEntry("Get-SPWorkflowScannerWorkflows", typeof(CmdGetSPWorkflowScannerWorkflows), null)
             );
             _runspace = RunspaceFactory.CreateRunspace(initialSessionState);
 
