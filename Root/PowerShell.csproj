@@ -300,7 +300,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CmdGetWorkflowAssociationsForOnprem.cs" />
+    <Compile Include="CmdGetSPWorkflowScannerWorkflows.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

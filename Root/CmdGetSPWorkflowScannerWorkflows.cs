@@ -17,34 +17,34 @@ namespace PowerShell
     ///   list and document libraries
     /// </summary
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionURLFilePath .\sites.csv</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -SiteCollectionURLFilePath .\sites.csv</code>
     /// <para>Using credentials of current logged in user, scan all sites in the sites.csv.</para>
     /// </example>
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionURLFilePath .\sites.csv -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -SiteCollectionURLFilePath .\sites.csv -Credential $Cred -Domain "ad.xyz123domain.com"</code>
     /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain,scan all sites in the sites.csv.</para>
     /// </example>
-    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123"</code>
     /// <para>Using credentials of current logged in user, scan the single Test123 site collection.</para>
     /// </example
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -SiteCollectionUrl "https://sp2016.ad.xyz123domain.com/sites/Test123" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
     /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain,scan the single Test123 site collection.</para>
     /// </example>
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -WebApplicationUrl "https://sp2016.ad.xyz123domain.com"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -WebApplicationUrl "https://sp2016.ad.xyz123domain.com"</code>
     /// <para>Using a PSCredential object ($Cred), enumerate all sites in the provided web application and scan for workflow in the site collection.</para>
     /// </example>
     /// /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -WebApplicationUrl "https://sp2016.ad.xyz123domain.com" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -WebApplicationUrl "https://sp2016.ad.xyz123domain.com" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
     /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain, enumerate all sites in the provided web application and scan for workflow in the site collection.</para>
     /// </example>
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput"</code>
     /// <para>Using credentials of current logged in user, enumerate all sites in the farm. NOTE: This must be run on a SharePoint Server.</para>
     /// </example>
     /// <example>
-    /// <code>Get-SPWorkflowScannerWorkflows -Credential $Cred -Domain "ad.xyz123domain.com"</code>
+    /// <code>Get-SPWorkflowScannerWorkflows -AssessmentOutputFolder "C:\AssessmentOutput" -Credential $Cred -Domain "ad.xyz123domain.com"</code>
     /// <para>Using a PSCredential object ($Cred) for authentication on the ad.xyz123domain.com domain, enumerate all sites in the farm. NOTE: This must be run on a SharePoint Server.</para>
     /// </example>
     /// <param name="DomainName">Name of the domain paired with a provided credential.</param>
